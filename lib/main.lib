@@ -39,7 +39,7 @@ TEXT_DEFAULT="tput sgr0"
 
 # define our standard class
 class std
-  func msg
+	func msg
 	
 std::msg () {
 	# message function. We are building in additional functionality, to make it simple to create messages to standard
@@ -52,13 +52,14 @@ std::msg () {
 	local FORMAT="$2";
 	local STATUS="$3";
 	local FORMAT_COMMAND=;
-	local FORMAT_LIST=$(echo "$FORMAT" | tr ',' '\n');
+	local FORMAT_LIST=$(echo "$FORMAT" | tr ' ' '_');
+	FORMAT_LIST=$(echo "$FORMAT_LIST" | tr ',' '\n');
 	for i in ${FORMAT_LIST}; do
 		local FORMATTING=;
 		# for each arg in our formatting, let's parse it, set it to the correct 
 		# colour variable, and then format. This let's use be less strict with 
 		# what needs to be passed, allowing "red" vs. "TEXT_RED"
-		local arg=$(string.tolower $i);
+		local arg=$(string.tolower "$i");
 		case $arg in
 			"red" | "text_red")
 				FORMATTING="TEXT_RED";
@@ -75,22 +76,22 @@ std::msg () {
 			"magenta" | "text_magenta")
 				FORMATTING="TEXT_MAGENTA";
 				;;
-			"cyan" | "text_cyan" | "light blue" | "text_light_blue" | "lightblue" | "text_lightblue")
+			"cyan" | "text_cyan" | "light_blue" | "text_light_blue" | "lightblue" | "text_lightblue")
 				FORMATTING="TEXT_CYAN";
 				;;
-			"red background" | "red bg" | "text_red_bg")
+			"red_background" | "red_bg" | "text_red_bg")
 				FORMATTING="TEXT_RED_BG";
 				;;
-			"green backgroung" | "green bg" | "text_green_bg")
+			"green_backgroung" | "green_bg" | "text_green_bg")
 				FORMATTING="TEXT_GREEN_BG";
 				;;
-			"yellow backgroung" | "yellow bg" | "text_yellow_bg")
+			"yellow_backgroung" | "yellow_bg" | "text_yellow_bg")
 				FORMATTING="TEXT_YELLOW_BG";
 				;;
-			"blue background" | "blue bg" | "text_blue_bg")
+			"blue_background" | "blue_bg" | "text_blue_bg")
 				FORMATTING="TEXT_BLUE_BG";
 				;;
-			"magenta backgroung" | "magenta bg" | "text_magenta_bg")
+			"magenta_backgroung" | "magenta_bg" | "text_magenta_bg")
 				FORMATTING="TEXT_MAGENTA_BG";
 				;;
 			"bold" | "strong" | "text_bold")
@@ -105,8 +106,26 @@ std::msg () {
 		esac
 		FORMAT_COMMAND="${!FORMATTING};${FORMAT_COMMAND}";
 	done;
+	if [ -n "$STATUS" ]; then
+		local STATUS_DISPLAY=;
+		STATUS=$(string.tolower $STATUS);
+		case $STATUS in
+			"ok" | "okay")
+				STATUS_DISPLAY="$(${TEXT_DEFAULT};echo -n "[";${TEXT_GREEN};${TEXT_BOLD}; echo -n "   OK   ";${TEXT_DEFAULT}; echo -n "]";)";
+				;;
+			*)
+				STATUS_DISPLAY=;
+				;;
+		esac
+	fi
 	eval "${FORMAT_COMMAND}";
 	echo "$1";
+	if [ -n "$STATUS_DISPLAY" ]; then
+		let RES_COL=`tput cols`-12
+        tput cuf $RES_COL
+        tput cuu1
+		echo "${STATUS_DISPLAY}";
+	fi
 	${TEXT_DEFAULT};
 }
 
