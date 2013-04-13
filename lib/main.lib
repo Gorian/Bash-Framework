@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# we usr /usr/bin/env to make this compatible over multiple operating systems, where the location of bash changes
+# we use /usr/bin/env to make this compatible over multiple operating systems, where the location of bash changes
 # 
 # Framework Library
 #
