@@ -1,0 +1,21 @@
+#!/usr/bin/bash
+# MODULE FOR THE STRING CLASS
+
+# define our string class
+class string;
+  func tolower;
+	func toupper;
+	func replace;
+	
+string::tolower() {
+	echo "$1" | tr '[:upper:]' '[:lower:]';
+}
+
+string::toupper() {
+	echo "$1" | tr '[:lower:]' '[:upper:]';
+}
+
+string::replace() {
+	echo "$1" | sed "s/$2/$3/g";
+}
+new string string # initialize our string class
