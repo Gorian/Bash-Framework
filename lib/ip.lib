@@ -1,43 +1,45 @@
 #!/usr/bin/env bash
 #
-# MODULE FOR THE IP CLASS
+# MODULE FOR THE ip CLASS
 
-# define our IP class
-class IP
-  func validate
+# define our ip class
+class ip
+	func valid
 	func lookup
 	func request
 
-IP::Validate () {
-	# Takes 1 argument, IP to validate
+ip::valid () {
+	# Takes 1 argument, ip, to validate
+	# returns true or false
     local  ip=$1
-    local  stat=1
+    local  return='false';
 
-    if [[ "$ip" =~ "^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$" ]]; then
-		# since we aren't limited to /24 addresses, 255 as an octet is valid
-        # OIFS=$IFS;
-        # IFS='.';
-        # ip=($ip);
-        # IFS=$OIFS;
-        # [[ ${ip[0]} -le 255 && ${ip[1]} -le 255 && ${ip[2]} -le 255 && ${ip[3]} -le 255 ]]
-        stat=$?
+    if [[ "$ip" =~ ^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$ ]]; then
+	    OIFS=$IFS;
+        IFS='.';
+        ip=($ip);
+        IFS=$OIFS;
+        [[ ${ip[0]} -le 256 && ${ip[0]} -gt 0 && ${ip[1]} -le 255 && ${ip[2]} -le 255 && ${ip[3]} -le 255 ]]
+		if [ "$?" == "0" ]; then
+			return='true';
+		fi
     fi
-    echo "$stat"
+    echo "$return"
 }
 
-IP::lookup () {
+ip::lookup () {
     local HostName="$1";
-    local IP=
+    local ip=
     local request="$2";
     if [ "$(nslookup ${HostName} | grep "** server can\'t find ${HostName}" > /dev/null 2>&1;echo $?)" != "0" ]; then
-       IP=$(nslookup ${HostName} | grep -i 'address' | tail -1 | awk '{print $2}');
+       ip=$(nslookup ${HostName} | grep -i 'address' | tail -1 | awk '{print $2}');
     else
         if [ "$request" != "0" ];then
-            IP=$(requestIP 0);
+            ip=$(requestip 0);
         fi
     fi
-    echo "$IP";
+    echo "$ip";
 
 }
 
-new IP IP # initialize our IP class
+new ip ip # initialize our ip class
