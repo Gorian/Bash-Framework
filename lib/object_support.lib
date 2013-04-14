@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# provides "object" and "class" support. See below for credit
+# provides "object" and "class" support for our scripts. See below for credit
 # ---------------------------------------------------------------------------
 # OO support functions
 # Kludged by Pim van Riezen <pi@madscience.nl>
