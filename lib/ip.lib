@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+#
+# MODULE FOR THE IP CLASS
+
+# define our IP class
+class IP
+  func validate
+	func lookup
+	func request
+
+IP::Validate () {
+	# Takes 1 argument, IP to validate
+    local  ip=$1
+    local  stat=1
+
+    if [[ "$ip" =~ "^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$" ]]; then
+		# since we aren't limited to /24 addresses, 255 as an octet is valid
+        # OIFS=$IFS;
+        # IFS='.';
+        # ip=($ip);
+        # IFS=$OIFS;
+        # [[ ${ip[0]} -le 255 && ${ip[1]} -le 255 && ${ip[2]} -le 255 && ${ip[3]} -le 255 ]]
+        stat=$?
+    fi
+    echo "$stat"
+}
+
+IP::lookup () {
+    local HostName="$1";
+    local IP=
+    local request="$2";
+    if [ "$(nslookup ${HostName} | grep "** server can\'t find ${HostName}" > /dev/null 2>&1;echo $?)" != "0" ]; then
+       IP=$(nslookup ${HostName} | grep -i 'address' | tail -1 | awk '{print $2}');
+    else
+        if [ "$request" != "0" ];then
+            IP=$(requestIP 0);
+        fi
+    fi
+    echo "$IP";
+
+}
+
+new IP IP # initialize our IP class
