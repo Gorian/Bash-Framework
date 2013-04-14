@@ -5,14 +5,15 @@
 #
 # Gorian
 
-## Here we source our other libraries ##
-. ./object_support.lib # lets us create psuedo classes
-
 
 ## Here we define our constants ##
 # we set a tab length of 4 spaces
+
+# THIS IS IMPORTANTS. WE SOURCE OUR LIBRARY FROM THIS DIRECTORY
+LIBRARY_DIRECTORY='/scripts/lib';
+
+COMPANY_NAME='';
 TAB='    ';
-#
 # Define our colours
 # foreground colours
 TEXT_RED="tput setaf 1"
@@ -35,158 +36,9 @@ TEXT_UNDERLINE="tput sgr 0 1"
 TEXT_DEFAULT="tput sgr0"
 #
 
-## Here we define our functions ##
 
-# define our standard class
-class std
-	func msg
-	
-std::msg () {
-	# message function. We are building in additional functionality, to make it simple to create messages to standard
-	# out with color and text formatting. Only one argument is needed, the message. We will default to the default
-	# color and format if none are passed
-	# arguments:
-	#           1: message
-	#           2: text format
-	local MESSAGE="$1";
-	local FORMAT="$2";
-	local STATUS="$3";
-	local FORMAT_COMMAND=;
-	local FORMAT_LIST=$(echo "$FORMAT" | tr ' ' '_');
-	FORMAT_LIST=$(echo "$FORMAT_LIST" | tr ',' '\n');
-	for i in ${FORMAT_LIST}; do
-		local FORMATTING=;
-		# for each arg in our formatting, let's parse it, set it to the correct 
-		# colour variable, and then format. This let's use be less strict with 
-		# what needs to be passed, allowing "red" vs. "TEXT_RED"
-		local arg=$(string.tolower "$i");
-		case $arg in
-			"red" | "text_red")
-				FORMATTING="TEXT_RED";
-				;;
-			"green" | "text_green")
-				FORMATTING="TEXT_GREEN";
-				;;
-			"yellow" | "text_yellow")
-				FORMATTING="TEXT_YELLOW";
-				;;
-			"blue" | "text_blue")
-				FORMATTING="TEXT_BLUE";
-				;;
-			"magenta" | "text_magenta")
-				FORMATTING="TEXT_MAGENTA";
-				;;
-			"cyan" | "text_cyan" | "light_blue" | "text_light_blue" | "lightblue" | "text_lightblue")
-				FORMATTING="TEXT_CYAN";
-				;;
-			"red_background" | "red_bg" | "text_red_bg")
-				FORMATTING="TEXT_RED_BG";
-				;;
-			"green_backgroung" | "green_bg" | "text_green_bg")
-				FORMATTING="TEXT_GREEN_BG";
-				;;
-			"yellow_backgroung" | "yellow_bg" | "text_yellow_bg")
-				FORMATTING="TEXT_YELLOW_BG";
-				;;
-			"blue_background" | "blue_bg" | "text_blue_bg")
-				FORMATTING="TEXT_BLUE_BG";
-				;;
-			"magenta_backgroung" | "magenta_bg" | "text_magenta_bg")
-				FORMATTING="TEXT_MAGENTA_BG";
-				;;
-			"bold" | "strong" | "text_bold")
-				FORMATTING="TEXT_BOLD";
-				;;
-			"underline" | "text_underline")
-				FORMATTING="TEXT_UNDERLINE";
-				;;
-			*)
-				FORMATTING="TEXT_DEFAULT";
-				;;
-		esac
-		FORMAT_COMMAND="${!FORMATTING};${FORMAT_COMMAND}";
-	done;
-	if [ -n "$STATUS" ]; then
-		local STATUS_DISPLAY=;
-		STATUS=$(string.tolower $STATUS);
-		case $STATUS in
-			"ok" | "okay")
-				STATUS_DISPLAY="$(${TEXT_DEFAULT};echo -n "[";${TEXT_GREEN};${TEXT_BOLD}; echo -n "   OK   ";${TEXT_DEFAULT}; echo -n "]";)";
-				;;
-			*)
-				STATUS_DISPLAY=;
-				;;
-		esac
-	fi
-	eval "${FORMAT_COMMAND}";
-	echo "$1";
-	if [ -n "$STATUS_DISPLAY" ]; then
-		let RES_COL=`tput cols`-12
-        tput cuf $RES_COL
-        tput cuu1
-		echo "${STATUS_DISPLAY}";
-	fi
-	${TEXT_DEFAULT};
-}
-
-
-new std std; # initialize our class
-
-# define our IP class
-class IP
-	func validate
-	func lookup
-	func request
-
-IP::Validate () {
-	# Takes 1 argument, IP to validate
-    local  ip=$1
-    local  stat=1
-
-    if [[ "$ip" =~ "^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$" ]]; then
-		# since we aren't limited to /24 addresses, 255 as an octet is valid
-        # OIFS=$IFS;
-        # IFS='.';
-        # ip=($ip);
-        # IFS=$OIFS;
-        # [[ ${ip[0]} -le 255 && ${ip[1]} -le 255 && ${ip[2]} -le 255 && ${ip[3]} -le 255 ]]
-        stat=$?
-    fi
-    echo "$stat"
-}
-
-IP::lookup () {
-    local HostName="$1";
-    local IP=
-    local request="$2";
-    if [ "$(nslookup ${HostName} | grep "** server can\'t find ${HostName}" > /dev/null 2>&1;echo $?)" != "0" ]; then
-       IP=$(nslookup ${HostName} | grep -i 'address' | tail -1 | awk '{print $2}');
-    else
-        if [ "$request" != "0" ];then
-            IP=$(requestIP 0);
-        fi
-    fi
-    echo "$IP";
-
-}
-
-new IP IP # initialize our IP class
-
-# define our string class
-class string;
-	func tolower;
-	func toupper;
-	func replace;
-	
-string::tolower() {
-	echo "$1" | tr '[:upper:]' '[:lower:]';
-}
-
-string::toupper() {
-	echo "$1" | tr '[:lower:]' '[:upper:]';
-}
-
-string::replace() {
-	echo "$1" | sed "s/$2/$3/g";
-}
-new string string # initialize our string class
+## Here we source our other libraries (AFTER we define our CONSTANTS ##
+. ${LIBRARY_DIRECTORY}/object_support.lib # lets us create psuedo classes
+. ${LIBRARY_DIRECTORY}/standard.lib # our standard library
+. ${LIBRARY_DIRECTORY}/ip.lib # defines our IP related functions
+. ${LIBRARY_DIRECTORY}/string.lib # defines our string related functions
