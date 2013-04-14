@@ -1,0 +1,104 @@
+#!/usr/bin/env bash
+#
+# DEFINE OUR STANDARD CLASS
+
+# define our standard class
+class std
+  func msg
+	
+std::msg () {
+	# message function. We are building in additional functionality, to make it simple to create messages to standard
+	# out with color and text formatting. Only one argument is needed, the message. We will default to the default
+	# color and format if none are passed
+	# arguments:
+	#           1: message
+	#           2: text format
+	local MESSAGE="$1";
+	local FORMAT="$2";
+	local STATUS="$3";
+	local FORMAT_COMMAND=;
+	local FORMAT_LIST=$(echo "$FORMAT" | tr ' ' '_');
+	FORMAT_LIST=$(echo "$FORMAT_LIST" | tr ',' '\n');
+	for i in ${FORMAT_LIST}; do
+		local FORMATTING=;
+		# for each arg in our formatting, let's parse it, set it to the correct 
+		# colour variable, and then format. This let's use be less strict with 
+		# what needs to be passed, allowing "red" vs. "TEXT_RED"
+		local arg=$(string.tolower "$i");
+		case $arg in
+			"red" | "text_red")
+				FORMATTING="TEXT_RED";
+				;;
+			"green" | "text_green")
+				FORMATTING="TEXT_GREEN";
+				;;
+			"yellow" | "text_yellow")
+				FORMATTING="TEXT_YELLOW";
+				;;
+			"blue" | "text_blue")
+				FORMATTING="TEXT_BLUE";
+				;;
+			"magenta" | "text_magenta")
+				FORMATTING="TEXT_MAGENTA";
+				;;
+			"cyan" | "text_cyan" | "light_blue" | "text_light_blue" | "lightblue" | "text_lightblue")
+				FORMATTING="TEXT_CYAN";
+				;;
+			"red_background" | "red_bg" | "text_red_bg")
+				FORMATTING="TEXT_RED_BG";
+				;;
+			"green_backgroung" | "green_bg" | "text_green_bg")
+				FORMATTING="TEXT_GREEN_BG";
+				;;
+			"yellow_backgroung" | "yellow_bg" | "text_yellow_bg")
+				FORMATTING="TEXT_YELLOW_BG";
+				;;
+			"blue_background" | "blue_bg" | "text_blue_bg")
+				FORMATTING="TEXT_BLUE_BG";
+				;;
+			"magenta_backgroung" | "magenta_bg" | "text_magenta_bg")
+				FORMATTING="TEXT_MAGENTA_BG";
+				;;
+			"bold" | "strong" | "text_bold")
+				FORMATTING="TEXT_BOLD";
+				;;
+			"underline" | "text_underline")
+				FORMATTING="TEXT_UNDERLINE";
+				;;
+			*)
+				FORMATTING="TEXT_DEFAULT";
+				;;
+		esac
+		FORMAT_COMMAND="${!FORMATTING};${FORMAT_COMMAND}";
+	done;
+	if [ -n "$STATUS" ]; then
+		local STATUS_DISPLAY=;
+		STATUS=$(string.tolower $STATUS);
+		case $STATUS in
+			"ok" | "okay")
+				STATUS_DISPLAY="$(${TEXT_DEFAULT};echo -n "[";${TEXT_GREEN};${TEXT_BOLD}; echo -n "   OK   ";${TEXT_DEFAULT}; echo -n "]";)";
+				;;
+			"alert")
+				STATUS_DISPLAY="$(${TEXT_DEFAULT};echo -n "[";${TEXT_RED};${TEXT_BOLD}; echo -n " ALERT! ";${TEXT_DEFAULT}; echo -n "]";)";
+				;;
+			"notice")
+				STATUS_DISPLAY="$(${TEXT_DEFAULT};echo -n "[";${TEXT_BLUE};${TEXT_BOLD}; echo -n " NOTICE ";${TEXT_DEFAULT}; echo -n "]";)";
+				;;
+			*)
+				STATUS_DISPLAY=;
+				;;
+		esac
+	fi
+	eval "${FORMAT_COMMAND}";
+	echo "$1";
+	if [ -n "$STATUS_DISPLAY" ]; then
+		let RES_COL=`tput cols`-12
+        tput cuf $RES_COL
+        tput cuu1
+		echo "${STATUS_DISPLAY}";
+	fi
+	${TEXT_DEFAULT};
+}
+
+
+new std std; # initialize our class
