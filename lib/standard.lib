@@ -4,7 +4,7 @@
 
 # define our standard class
 class std
-  func msg
+	func msg
 	
 std::msg () {
 	# message function. We are building in additional functionality, to make it simple to create messages to standard
