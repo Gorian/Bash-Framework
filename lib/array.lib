@@ -80,3 +80,4 @@ array::reverse(){
 		eval "${lib_array_reverse_varName}=("${lib_array_reverse_reverseArray[@]}")"
 	fi
 }
+new array array # initialize our array class
