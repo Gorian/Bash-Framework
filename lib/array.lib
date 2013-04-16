@@ -1,0 +1,34 @@
+#!/usr/bin/bash
+#
+# MODULE FOR THE ARRAY CLASS
+
+class array
+  func push # array.push <name of array> <values to push to array>
+	func pop # array.pup <name of array> <variable name to save "popped" value to>
+	func shift
+	func unshift
+	
+array::push() {
+	local arrayName="$1";
+	while [ -n "$2" ]; do 
+		local value="$2";
+		local tempArray=;
+		eval tempArray=\( \${${arrayName}[@]} \);
+		eval "${arrayName}=("${tempArray[@]}" "$value")";
+		shift
+	done
+}
+
+array::pop() {
+	local arrayName="$1";
+	local varName="$2";
+	local tempArray=;
+	eval tempArray=\( \${${arrayName}[@]} \);
+	local value_index=$(expr ${#tempArray[@]} - 1);
+	local value=${tempArray[$value_index]};
+	unset tempArray[$value_index];
+	eval "${arrayName}=("${tempArray[@]}")";
+	if [ -n "$varName" ]; then
+		eval "${varName}="${value}"";
+	fi
+}
