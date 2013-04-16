@@ -3,14 +3,17 @@
 # 
 # Framework Library
 #
-# Gorian
+# Gorian                                                                    
 
 
 ## Here we define our constants ##
-# we set a tab length of 4 spaces
-
 # THIS IS IMPORTANTS. WE SOURCE OUR LIBRARY FROM THIS DIRECTORY
 LIBRARY_DIRECTORY='/scripts/lib';
+
+# GET THE SYSTEM TYPE, linux, solaris, aix, bsd, etc.
+SYSTEM_TYPE="$(uname -s)";
+# SunOS=Solaris, Linux=Linux (Ubuntu, Redhat, Suse, etc.), HP-UX=HP-UX
+
 
 COMPANY_NAME='';
 TAB='    ';
@@ -36,9 +39,43 @@ TEXT_UNDERLINE="tput sgr 0 1"
 TEXT_DEFAULT="tput sgr0"
 #
 
+source_all() {
+  for i in $(ls ${LIBRARY_DIRECTORY} | grep ^.*\.lib | grep -v 'main.lib' | grep -v 'object_support.lib'); do
+		. ${LIBRARY_DIRECTORY}/${i};
+	done
+}
 
-## Here we source our other libraries (AFTER we define our CONSTANTS ##
-. ${LIBRARY_DIRECTORY}/object_support.lib # lets us create psuedo classes
-. ${LIBRARY_DIRECTORY}/standard.lib # our standard library
-. ${LIBRARY_DIRECTORY}/ip.lib # defines our IP related functions
-. ${LIBRARY_DIRECTORY}/string.lib # defines our string related functions
+source_basic() {
+	# list of basic libraries to source
+	. ${LIBRARY_DIRECTORY}/string.lib
+	. ${LIBRARY_DIRECTORY}/standard.lib
+}
+
+sourcelib(){
+	lib="$(echo "$1" | awk -F".lib" '{print $1}')";
+	. ${LIBRARY_DIRECTORY}/${lib}.lib;
+}
+## Here we source our other libraries (AFTER we define our CONSTANTS) ##
+# lets us create psuedo classes; All of our other scripts require this, so it has to be loaded first.
+. ${LIBRARY_DIRECTORY}/object_support.lib 
+# if no arguments are specified, load all libraries
+if [ -z "$1" ]; then 
+	source_all
+	unset $@;
+fi
+while [ -n "$1" ]; do
+	case "$1" in
+		"all")
+			source_all;
+			break; # since we are just sourcing everything else, break and don't parse any more arguments
+			;;
+		"basic")
+			source_basic;
+			shift;
+			;;
+		*)
+			sourcelib $1;
+			shift;
+			;;
+	esac
+done
