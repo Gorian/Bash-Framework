@@ -1,34 +1,82 @@
 #!/usr/bin/bash
 #
 # MODULE FOR THE ARRAY CLASS
+# 
+# Due to NOT running in a sub-shell, we name ALL our variables as so: lib_array_<array function name>_<variable name>
+# in order to minimize the risk of variable collision is scripts.
 
 class array
-  func push # array.push <name of array> <values to push to array>
-	func pop # array.pup <name of array> <variable name to save "popped" value to>
+	func push # array.push <name of array> <values to push to array>
+	func pop # array.pup <name of array> <variable name to save popped value to>
 	func shift
 	func unshift
+	func reverse
 	
 array::push() {
-	local arrayName="$1";
+	local lib_array_push_arrayName="$1";
 	while [ -n "$2" ]; do 
-		local value="$2";
-		local tempArray=;
-		eval tempArray=\( \${${arrayName}[@]} \);
-		eval "${arrayName}=("${tempArray[@]}" "$value")";
+		local lib_array_push_value="$2";
+		local lib_array_push_tempArray=;
+		eval lib_array_push_tempArray=\( \${${lib_array_push_arrayName}[@]} \);
+		eval "${lib_array_push_arrayName}=("${lib_array_push_tempArray[@]}" "$lib_array_push_value")";
 		shift
 	done
 }
 
 array::pop() {
-	local arrayName="$1";
-	local varName="$2";
-	local tempArray=;
-	eval tempArray=\( \${${arrayName}[@]} \);
-	local value_index=$(expr ${#tempArray[@]} - 1);
-	local value=${tempArray[$value_index]};
-	unset tempArray[$value_index];
-	eval "${arrayName}=("${tempArray[@]}")";
-	if [ -n "$varName" ]; then
-		eval "${varName}="${value}"";
+	local lib_array_pop_arrayName="$1";
+	local lib_array_pop_varName="$2";
+	local lib_array_pop_tempArray=;
+	eval lib_array_pop_tempArray=\( \${${lib_array_pop_arrayName}[@]} \);
+	local lib_array_pop_value_index=$(expr ${#lib_array_pop_tempArray[@]} - 1);
+	local lib_array_pop_value=${lib_array_pop_tempArray[$lib_array_pop_value_index]};
+	unset lib_array_pop_tempArray[$lib_array_pop_value_index];
+	eval "${lib_array_pop_arrayName}=("${lib_array_pop_tempArray[@]}")";
+	if [ -n "$lib_array_pop_varName" ]; then
+		eval "${lib_array_pop_varName}="${lib_array_pop_value}"";
+	else
+		echo "$lib_array_pop_varName";
+	fi
+}
+
+array::unshift(){
+	local lib_array_unshift_arrayName="$1";
+	local lib_array_unshift_tempArray=;
+	eval lib_array_unshift_tempArray=\( \${${lib_array_unshift_arrayName}[@]} \);
+	shift
+	lib_array_unshift_args=("$@");
+	echo "args are ${lib_array_unshift_args[@]}";
+	eval "${lib_array_unshift_arrayName}=("${lib_array_unshift_args[@]}" "${lib_array_unshift_tempArray[@]}")";
+	
+}
+
+array::shift() {
+	local lib_array_shift_arrayName="$1";
+	local lib_array_shift_varName="$2";
+	local lib_array_shift_tempArray=;
+	eval lib_array_shift_tempArray=\( \${${lib_array_shift_arrayName}[@]} \);
+	local lib_array_shift_value=${lib_array_shift_tempArray[0]};
+	unset lib_array_shift_tempArray[0];
+	eval "${lib_array_shift_arrayName}=("${lib_array_shift_tempArray[@]}")";
+	if [ -n "$lib_array_shift_varName" ]; then
+		eval "${lib_array_shift_varName}="${lib_array_shift_value}"";
+	else
+		echo "$lib_array_shift_varName";
+	fi
+}
+array::reverse(){
+	local lib_array_reverse_arrayName="$1";
+	local lib_array_reverse_varName="$2";
+	eval lib_array_reverse_tempArray=\( \${${lib_array_reverse_arrayName}[@]} \);
+	local lib_array_reverse_reverseArray=;
+	lib_array_reverse_num=0;
+	for i in ${lib_array_reverse_tempArray[@]}; do
+		 lib_array_reverse_reverseArray=("${lib_array_reverse_tempArray[$num]}" "${lib_array_reverse_reverseArray[@]}");
+		 num=$(expr $lib_array_reverse_num + 1);
+	done
+	if [ -z "$lib_array_reverse_varName" ];then 
+		eval "${lib_array_reverse_arrayName}=("${lib_array_reverse_reverseArray[@]}")"
+	else
+		eval "${lib_array_reverse_varName}=("${lib_array_reverse_reverseArray[@]}")"
 	fi
 }
