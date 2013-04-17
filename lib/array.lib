@@ -45,7 +45,6 @@ array::unshift(){
 	eval lib_array_unshift_tempArray=\( \${${lib_array_unshift_arrayName}[@]} \);
 	shift
 	lib_array_unshift_args=("$@");
-	echo "args are ${lib_array_unshift_args[@]}";
 	eval "${lib_array_unshift_arrayName}=("${lib_array_unshift_args[@]}" "${lib_array_unshift_tempArray[@]}")";
 	
 }
