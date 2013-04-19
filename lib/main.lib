@@ -38,10 +38,15 @@ TEXT_BOLD="tput bold"
 TEXT_UNDERLINE="tput sgr 0 1"
 TEXT_DEFAULT="tput sgr0"
 #
+LIB_MODULE_LIST=("main"); # initialize our list of loaded modules
+LIB_CLASS_LIST=;
+LIB_FUNCTION_LIST=;
 
+
+## functions (define here only functions used in the framework.)
 source_all() {
-  for i in $(ls ${LIBRARY_DIRECTORY} | grep ^.*\.lib | grep -v 'main.lib' | grep -v 'object_support.lib'); do
-		. ${LIBRARY_DIRECTORY}/${i};
+	for i in $(ls ${LIBRARY_DIRECTORY} | grep ^.*\.lib); do
+		librequire $i;
 	done
 }
 
@@ -52,9 +57,37 @@ source_basic() {
 }
 
 sourcelib(){
-	lib="$(echo "$1" | awk -F".lib" '{print $1}')";
+	# strip off a trailing ".lib" if there is one, and convert to lowercase
+	local lib="$(echo "$1" | awk -F".lib" '{print $1}' | tr '[:upper:]' '[:lower:]')"; 
 	. ${LIBRARY_DIRECTORY}/${lib}.lib;
 }
+
+librequire(){
+	# accepts a single argument, the library required
+	local module="$(echo "$1" | awk -F".lib" '{print $1}' | tr '[:upper:]' '[:lower:]')";
+	local loaded='FALSE';
+	local forRange="$(eval "echo {0..${#LIB_MODULE_LIST[@]}}")";
+	for i in $forRange; do
+		if [ "${LIB_MODULE_LIST[$i]}" == "${module}" ]; then
+			loaded='TRUE';
+		fi
+	done
+	if [ "$loaded" == "FALSE" ]; then
+		sourcelib ${module};
+	fi
+}
+
+constant() {
+	declare -r $@;
+}
+
+load() {
+	local className="$1";
+	local moduleName="$2";
+	new ${className} ${className}; # we initialize only a single instance of a class
+	LIB_MODULE_LIST=("${LIB_MODULE_LIST[@]}" "$moduleName"); # add this module to the list of loaded modules
+}
+
 ## Here we source our other libraries (AFTER we define our CONSTANTS) ##
 # lets us create psuedo classes; All of our other scripts require this, so it has to be loaded first.
 . ${LIBRARY_DIRECTORY}/object_support.lib 
@@ -74,7 +107,7 @@ while [ -n "$1" ]; do
 			shift;
 			;;
 		*)
-			sourcelib $1;
+			librequire $1;
 			shift;
 			;;
 	esac
