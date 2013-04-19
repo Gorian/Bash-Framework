@@ -4,6 +4,7 @@
 # 
 # Due to NOT running in a sub-shell, we name ALL our variables as so: lib_array_<array function name>_<variable name>
 # in order to minimize the risk of variable collision is scripts.
+local moduleName=$(echo "$_" | awk -F"=" '{print $NF}');
 
 class array
 	func push # array.push <name of array> <values to push to array>
@@ -79,4 +80,4 @@ array::reverse(){
 		eval "${lib_array_reverse_varName}=("${lib_array_reverse_reverseArray[@]}")"
 	fi
 }
-new array array # initialize our array class
+load array $moduleName
