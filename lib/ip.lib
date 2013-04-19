@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 #
 # MODULE FOR THE ip CLASS
+local moduleName=$(echo "$_" | awk -F"=" '{print $NF}');
 
 # define our ip class
 class ip
@@ -42,4 +43,4 @@ ip::lookup () {
 
 }
 
-new ip ip # initialize our ip class
+load ip $moduleName
