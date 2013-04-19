@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# provides "object" and "class" support for our scripts. See below for credit
+# provides "object" and "class" support. See below for credit
 # ---------------------------------------------------------------------------
 # OO support functions
 # Kludged by Pim van Riezen <pi@madscience.nl>
@@ -60,12 +60,22 @@ new() {
   local cvar="$2"
   shift
   shift
+  if  [ -z "${LIB_CLASS_LIST[0]}" ]; then
+  LIB_CLASS_LIST=("${class}");
+  else
+	LIB_CLASS_LIST=("${LIB_CLASS_LIST[@]}" "${class}");
+  fi
   local id=$(uuidgen | tr A-F a-f | sed -e "s/-//g")
   eval TYPEOF_${id}=$class
   eval $cvar=$id
   local funclist
   eval "funclist=\"\$CLASS_${class}_FUNCTIONS\""
   for func in $funclist; do
+    if  [ -z "${LIB_FUNCTION_LIST[0]}" ]; then
+	   LIB_FUNCTION_LIST=("${class}.${func}");
+    else
+	   LIB_FUNCTION_LIST=("${LIB_FUNCTION_LIST[@]}" "${class}.${func}");
+    fi
     eval "${cvar}.${func}() { local t=\$THIS; THIS=$id; local c=\$CLASS; CLASS=$class; loadvar; loadfunc; ${class}::${func} \"\$@\"; rt=\$?; savevar; CLASS=\$c; THIS=\$t; return $rt; }"
   done
   eval "${cvar}.${class} \"\$@\" || true" 2>/dev/null
@@ -113,3 +123,4 @@ new() {
 # echo "one: $one ($(typeof $one))"
 # echo "two: $two ($(typeof $two))"
 # echo "three: $three ($(typeof $two))"
+LIB_MODULE_LIST=("${LIB_MODULE_LIST[@]}" "object_support"); # add this module to the list of loaded modules
