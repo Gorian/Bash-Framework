@@ -1,6 +1,7 @@
 #!/usr/bin/bash
 #
 # MODULE FOR THE STRING CLASS
+local moduleName=$(echo "$_" | awk -F"=" '{print $NF}');
 
 # define our string class
 class string
@@ -19,4 +20,4 @@ string::toupper() {
 string::replace() {
 	echo "$1" | sed "s/$2/$3/g";
 }
-new string string # initialize our string class
+load string $moduleName
