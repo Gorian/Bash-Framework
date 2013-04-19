@@ -1,10 +1,18 @@
 #!/usr/bin/env bash
 #
 # DEFINE OUR STANDARD CLASS
+#
+# define our module name
+local moduleName=$(echo "$_" | awk -F"=" '{print $NF}');
+## Required libraries
+librequire string.lib
 
 # define our standard class
+
 class std
 	func msg
+	func seq
+	func err
 	
 std::msg () {
 	# message function. We are building in additional functionality, to make it simple to create messages to standard
@@ -90,15 +98,28 @@ std::msg () {
 		esac
 	fi
 	eval "${FORMAT_COMMAND}";
-	echo "$1";
+	printf "$1\n";
 	if [ -n "$STATUS_DISPLAY" ]; then
-		let RES_COL=`tput cols`-12
-        tput cuf $RES_COL
-        tput cuu1
-		echo "${STATUS_DISPLAY}";
+		let RES_COL=`tput cols`-12;
+        tput cuf $RES_COL;
+        tput cuu1;
+		printf "${STATUS_DISPLAY}\n";
 	fi
 	${TEXT_DEFAULT};
 }
 
+std::seq() {
+	local rangeStart="$1";
+	local rangeEnd="$2";
+	local num="$rangeStart";
+	while [ "$num" -lt "$rangeEnd" ]; do
+		printf "$num ";
+		num="$(expr $num + 1)";
+	done
+}
 
-new std std; # initialize our class
+# std::err() {
+	# # print to stderr
+# }
+
+load std $moduleName
