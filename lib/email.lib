@@ -1,0 +1,19 @@
+#!/usr/bin/bash
+#
+# MODULE FOR THE EMAIL CLASS
+local moduleName=$(echo "$_" | awk -F"=" '{print $NF}');
+
+# define our email class
+class email
+  func valid # validate correct email format
+	
+email::valid (){
+	local email="$1";
+	local return="false";
+	if [[ "$email" =~ ^.{1,}@.{1,}\..{1,}$ ]]; then
+		return="true";
+	fi
+	echo "$return";
+}
+
+load email $moduleName
