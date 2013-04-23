@@ -8,7 +8,7 @@
 
 ## Here we define our constants ##
 # THIS IS IMPORTANTS. WE SOURCE OUR LIBRARY FROM THIS DIRECTORY
-LIBRARY_DIRECTORY='/scripts/lib';
+LIBRARY_DIRECTORY="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 # GET THE SYSTEM TYPE, linux, solaris, aix, bsd, etc.
 SYSTEM_TYPE="$(uname -s)";
@@ -88,6 +88,9 @@ load() {
 	LIB_MODULE_LIST=("${LIB_MODULE_LIST[@]}" "$moduleName"); # add this module to the list of loaded modules
 }
 
+## ERROR HANDLING
+
+
 ## Here we source our other libraries (AFTER we define our CONSTANTS) ##
 # lets us create psuedo classes; All of our other scripts require this, so it has to be loaded first.
 . ${LIBRARY_DIRECTORY}/object_support.lib 
@@ -98,7 +101,7 @@ if [ -z "$1" ]; then
 fi
 while [ -n "$1" ]; do
 	case "$1" in
-		"all")
+		"all" | "default")
 			source_all;
 			break; # since we are just sourcing everything else, break and don't parse any more arguments
 			;;
