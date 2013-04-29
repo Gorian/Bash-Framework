@@ -8,10 +8,12 @@ local moduleName=$(echo "$_" | awk -F"=" '{print $NF}');
 
 class array
 	func push # array.push <name of array> <values to push to array>
-	func pop # array.pup <name of array> <variable name to save popped value to>
-	func shift
-	func unshift
-	func reverse
+	func pop # array.pop <name of array> [<variable name to save popped value to>]
+	func shift # array.shift <name of array> [<variable name to save shifted value to>]
+	func unshift # array.unshift <name of array> <values to shift to array>
+	func reverse # array.reverse <name of array> [<variable to save reversed array to>]
+	func sort # array.sort <name of array> [<sorting method (ascending/descending/numeric)>] [<variable to save sorted array to>]
+	func walk # array.walk <name of array> <command to run> <any arguments to command>; use %C% to represent the array element in the command
 	
 array::push() {
 	local lib_array_push_arrayName="$1";
@@ -32,6 +34,7 @@ array::pop() {
 	local lib_array_pop_value_index=$(expr ${#lib_array_pop_tempArray[@]} - 1);
 	local lib_array_pop_value=${lib_array_pop_tempArray[$lib_array_pop_value_index]};
 	unset lib_array_pop_tempArray[$lib_array_pop_value_index];
+	lib_array_pop_tempArray=( ${lib_array_pop_tempArray[*]} );
 	eval "${lib_array_pop_arrayName}=("${lib_array_pop_tempArray[@]}")";
 	if [ -n "$lib_array_pop_varName" ]; then
 		eval "${lib_array_pop_varName}="${lib_array_pop_value}"";
@@ -57,6 +60,7 @@ array::shift() {
 	eval lib_array_shift_tempArray=\( \${${lib_array_shift_arrayName}[@]} \);
 	local lib_array_shift_value=${lib_array_shift_tempArray[0]};
 	unset lib_array_shift_tempArray[0];
+	lib_array_shift_tempArray=( ${lib_array_shift_tempArray[*]} );
 	eval "${lib_array_shift_arrayName}=("${lib_array_shift_tempArray[@]}")";
 	if [ -n "$lib_array_shift_varName" ]; then
 		eval "${lib_array_shift_varName}="${lib_array_shift_value}"";
@@ -79,5 +83,67 @@ array::reverse(){
 	else
 		eval "${lib_array_reverse_varName}=("${lib_array_reverse_reverseArray[@]}")"
 	fi
+}
+
+array::sort() {
+	local lib_array_sort_arrayName="$1";
+	local lib_array_sort_varName=;
+	local lib_array_sort_sortType=;
+	# here we sort through the remaining arguments to see if a variable name and/or sort type is specified.
+	# while this method allows an undefined number arguments to be processed the last arguments to be processed
+	# are the ones that are set.
+	while [[ -n $2 ]]; do
+		case $2 in
+			"asc" | "ascending")
+				lib_array_sort_sortType="ascending";
+				shift;
+				;;
+			"desc" | "descending")
+				lib_array_sort_sortType="descending";
+				shift;
+				;;
+			"numeric")
+				lib_array_sort_sortType="numeric";
+				shift;
+				;;
+			*)
+				lib_array_sort_varName="$2";
+				shift;
+				;;
+		esac
+	done
+	local lib_array_sort_tempArray=;
+	local lib_array_sort_tempArray_sorted=;
+	eval lib_array_sort_tempArray=\( \${${lib_array_sort_arrayName}[@]} \);
+	# Here we do the actual sorting
+	if [[ "${lib_array_sort_sortType}" == "descending" ]]; then
+		lib_array_sort_tempArray_sorted=$(printf '%s\n' "${lib_array_sort_tempArray[@]}" | sort -r);
+	elif [[ "${lib_array_sort_sortType}" == "numeric" ]]; then
+		lib_array_sort_tempArray_sorted=$(printf '%s\n' "${lib_array_sort_tempArray[@]}" | sort -n);
+	else
+		lib_array_sort_tempArray_sorted=$(printf '%s\n' "${lib_array_sort_tempArray[@]}" | sort);
+	fi
+	# and, our cleanup
+	if [ -n "$lib_array_sort_varName" ]; then
+		eval "${lib_array_sort_varName}=("${lib_array_sort_tempArray_sorted[@]}")";
+	else
+		eval "${lib_array_sort_arrayName}=("${lib_array_sort_tempArray_sorted[@]}")";
+	fi
+}
+
+array::walk() {
+	# after we set our variables for the first 2 arguments, we "shift" the first 2 arguments
+	# off the argument stack so we can call all the remaining arguments with "$@"
+	local lib_array_walk_arrayName="$1";
+	local lib_array_walk_command="$2";
+	shift;
+	shift;
+	eval lib_array_walk_tempArray=\( \${${lib_array_walk_arrayName}[@]} \);
+	local lib_array_walk_rangeEnd=$(expr ${#lib_array_walk_tempArray[@]} - 1);
+	local lib_array_walk_forRange="$(eval "echo {0..${lib_array_walk_rangeEnd}}")";
+	for i in ${lib_array_walk_forRange}; do
+		local lib_array_walk_arguments=$(eval echo \"$@\" | sed s/%%C/\${${lib_array_walk_arrayName}[$i]}/);
+		eval ${lib_array_walk_command} ${lib_array_walk_arguments};
+	done
 }
 load array $moduleName
