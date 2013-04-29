@@ -13,7 +13,7 @@ class array
 	func unshift # array.unshift <name of array> <values to shift to array>
 	func reverse # array.reverse <name of array> [<variable to save reversed array to>]
 	func sort # array.sort <name of array> [<sorting method (ascending/descending/numeric)>] [<variable to save sorted array to>]
-	func walk # array.walk <name of array> <command to run> <any arguments to command>; use %C% to represent the array element in the command
+	func walk # array.walk <name of array> <command to run> <any arguments to command>; use %%C to represent the array element in the command
 	
 array::push() {
 	local lib_array_push_arrayName="$1";
