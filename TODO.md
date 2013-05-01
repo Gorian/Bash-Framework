@@ -26,9 +26,6 @@ TODO LIST
 - [ ] string.join
 - [ ] reorder load function
 - [ ] move from main.lib arguments to librequire function
-- [ ]  write documentation
-- [ ]  create test scripts
-
-```bash
-test
-```
+- [ ] write documentation
+- [ ] create test scripts
+- [ ] this is an incomplete item
