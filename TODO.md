@@ -28,4 +28,3 @@ TODO LIST
 - [ ] move from main.lib arguments to librequire function
 - [ ] write documentation
 - [ ] create test scripts
-- [ ] this is an incomplete item
