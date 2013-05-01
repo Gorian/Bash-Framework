@@ -8,9 +8,10 @@ Make sure that you use the full path in your scripts, or you may encounter probl
 
 In order to load a module, use librequire
 
-\#!/usr/bin/env bash
+```bash
+#!/usr/bin/env bash
 . /myscripts/lib/main.lib
 librequire "my module.lib"
-\# rest of the script
-
+# rest of the script
+```
 
