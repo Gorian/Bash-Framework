@@ -146,4 +146,4 @@ array::walk() {
 		eval ${lib_array_walk_command} ${lib_array_walk_arguments};
 	done
 }
-load array $moduleName
+load ${moduleName} array;
