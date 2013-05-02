@@ -1,0 +1,53 @@
+#!/usr/bin/env/bash
+
+source_all() {
+  for i in $(ls ${LIBRARY_DIRECTORY} | grep ^.*\.lib); do
+		librequire $i;
+	done
+}
+
+# source_basic() {
+	# # list of basic libraries to source
+	# . ${LIBRARY_DIRECTORY}/string.lib
+	# . ${LIBRARY_DIRECTORY}/standard.lib
+# }
+
+sourcelib(){
+	# strip off a trailing ".lib" if there is one, and convert to lowercase
+	local lib="$(echo "$1" | awk -F".lib" '{print $1}' | tr '[:upper:]' '[:lower:]')"; 
+	. "${LIBRARY_DIRECTORY}/${lib}.lib";
+}
+
+librequire(){
+	# accepts a single argument, the library required
+	local librequire_function_module="$(echo "$1" | awk -F".lib" '{print $1}' | tr '[:upper:]' '[:lower:]')";
+	local librequire_function_loaded='FALSE';
+	local librequire_function_forRange="$(eval "echo {0..${#LIB_MODULE_LIST[@]}}")";
+	for i in $librequire_function_forRange; do
+		if [ "${LIB_MODULE_LIST[$i]}" == "${librequire_function_module}" ]; then
+			loaded='TRUE';
+		fi
+	done
+	if [ "$librequire_function_loaded" == "FALSE" ]; then
+		sourcelib "${librequire_function_module}";
+	fi
+}
+
+load() {
+	local load_function_moduleName="$1";
+	local load_function_className="$2";
+	if [[ -n "load_function_className" ]]; then
+		new ${load_function_className} ${load_function_className}; # we initialize only a single instance of a class
+	fi
+	LIB_MODULE_LIST=("${LIB_MODULE_LIST[@]}" "$load_function_moduleName"); # add this module to the list of loaded modules
+}
+
+getFunctionOpState() {
+	# Determine function operating state
+	if [[ ( "$BASH_SUBSHELL" == "0" && "$LIB_FUNC_OP_STATE_OVERRIDE" != "1" ) || "$LIB_FUNC_OP_STATE_OVERRIDE" == "0" ]] ; then
+		LIB_FUNC_OP_STATE="0";
+	elif [[ ( "$BASH_SUBSHELL" != "0" && "$LIB_FUNC_OP_STATE_OVERRIDE" != "0" ) || "$LIB_FUNC_OP_STATE_OVERRIDE" == "1" ]]; then
+		LIB_FUNC_OP_STATE="1";
+	fi
+	LIB_FUNC_OP_STATE_OVERRIDE="NULL"; 
+}
