@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+#
+# Here we will override any expected default programs or built-ins
+
+
+## A standardized "echo" command ##
+echo() {
+  if [ "$1" = "-n" ]
+	then
+		 shift;
+		 printf "%s" "$*";
+	else
+		 printf "%s\n" "$*";
+	fi
+}
