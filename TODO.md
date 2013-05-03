@@ -1,30 +1,37 @@
-TODO LIST
-=========
-
+#TODO
 - [x] list of all modules
 - [x] list of all classes
 - [x] list of all functions
-- [ ] network - get primary interface
-- [ ] network - get primary IP
-- [ ] network - get primary MAC
-- [ ] time.now
-- [ ] time.getdate
 - [ ] die (exit function)
-- [x] std.seq
-- [ ] crypt.sha512
-- [ ] crypt.md5
 - [x] require module
 - [x] module load
-- [x] ip.validate (ipv6 functionality)
-- [x] array.sort
-- [ ] array.merge
-- [ ] array.diff
-- [ ] array.search
-- [ ] array.unique
-- [x] array.walk
-- [ ] string.dif
-- [ ] string.join
-- [ ] reorder load function
-- [ ] move from main.lib arguments to librequire function
+- [x] reorder load function
+- [x] move from main.lib arguments to librequire function
 - [ ] write documentation
 - [ ] create test scripts
+- array
+  - [x] array.sort
+	- [ ] array.merge
+	- [ ] array.diff
+	- [ ] array.search
+	- [ ] array.unique
+	- [x] array.walk
+- crypt
+	- [ ] crypt.sha512
+	- [ ] crypt.md5
+- math
+	- [ ]math.abs (absolute value)
+- string
+	- [ ] string.diff
+	- [ ] string.join
+- network
+	- [ ] network - get primary interface
+	- [ ] network - get primary IP
+	- [ ] network - get primary MAC
+- time
+	- [ ] time.now
+	- [ ] time.getdate
+- standard
+	- [x] std.seq (sequence)
+- ip
+	- [x] ip.validate (ipv6 functionality)
